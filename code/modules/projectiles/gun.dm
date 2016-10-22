@@ -37,6 +37,8 @@
 	var/unique_reskin = 0 //allows one-time reskinning
 	var/current_skin = null //the skin choice if we had a reskin
 	var/list/options = list()
+	var/two_handed = 0 //Does the weapon require two hands?
+	var/wielded = 0
 
 	lefthand_file = 'icons/mob/inhands/guns_lefthand.dmi'
 	righthand_file = 'icons/mob/inhands/guns_righthand.dmi'
@@ -298,7 +300,87 @@ obj/item/weapon/gun/proc/newshot()
 			for(var/datum/action/item_action/toggle_gunlight/TGL in actions)
 				qdel(TGL)
 
+/obj/item/weapon/gun/proc/special_check(var/mob/user)
+	if(!istype(user, /mob/living))
+		return 0
+	if(!user.IsAdvancedToolUser())
+		return 0
 
+
+	var/obj/item/weapon/gun/offhand/O = user.get_inactive_held_item()
+	var/two_handed_check = 1
+	if(two_handed_check && two_handed && !istype(O))
+		user << "<span class='warning'>You must grab the [name] with both hands in order to fire.</span>"
+		return 0
+
+/obj/item/weapon/gun/mob_can_equip(mob/M, slot)
+	//Cannot equip wielded items.
+	if(two_handed && wielded)
+		M << "<span class='warning'>Unwield the [name] first!</span>"
+		return 0
+	return ..()
+
+/obj/item/weapon/gun/proc/unwield(mob/living/carbon/user)
+	if(!wielded || !user) return
+	wielded = 0
+	update_item_wielded()
+	var/sf = findtext(name," (Wielded)")
+	if(sf)
+		name = copytext(name,1,sf)
+	else //something wrong
+		name = "[initial(name)]"
+	update_icon()
+	user << "<span class='notice'>You are now carrying the [name] with one hand.</span>"
+	var/obj/item/weapon/gun/offhand/O = user.get_inactive_held_item()
+	if(O && istype(O))
+		O.unwield()
+	return
+
+/obj/item/weapon/gun/proc/wield(mob/living/carbon/user)
+	if(wielded) return
+	if(user.get_inactive_held_item())
+		user << "<span class='warning'>You need your other hand to be empty!</span>"
+		return
+	wielded = 1
+	update_item_wielded()
+	name = "[name] (Wielded)"
+	update_icon()
+	user << "<span class='notice'>You grab the [name] with both hands.</span>"
+	var/obj/item/weapon/gun/offhand/O = new(user) ////Let's reserve his other hand~
+	O.name = "[name] - offhand"
+	O.desc = "Your second grip on the [name]"
+	user.put_in_inactive_hand(O)
+	return
+
+/obj/item/weapon/gun/proc/update_item_wielded(mob/living/carbon/user)
+	if(wielded)
+		item_state = "[initial(item_state)]_w"
+	else
+		item_state = "[initial(item_state)]"
+	user.update_icons()
+	return
+
+/obj/item/weapon/gun/offhand
+	name = "offhand"
+	icon = 'icons/obj/weapons.dmi'
+	icon_state = "offhand"
+	item_state = null
+	w_class = 5.0
+	two_handed = 1
+
+/obj/item/weapon/gun/offhand/unwield()
+	qdel(src)
+
+/obj/item/weapon/gun/offhand/wield()
+	qdel(src)
+
+/obj/item/weapon/gun/dropped(mob/user)
+	//handles unwielding a twohanded weapon when dropped as well as clearing up the offhand
+	if(user && two_handed)
+		var/obj/item/weapon/gun/O = user.get_inactive_held_item()
+		if(istype(O))
+			O.unwield(user)
+		return	unwield(user)
 
 /obj/item/weapon/gun/proc/toggle_gunlight()
 	set name = "Toggle Gunlight"

@@ -366,3 +366,98 @@
 		if(T)
 			T.Click(location, control, params)
 	. = 1
+
+//Autofire
+/mob
+	var/mouse_hold = 0
+	var/fire_in_process = 0
+
+/atom/MouseDown(location,control,params)
+	var/list/modifiers = params2list(params)
+	if(modifiers["left"]) // Without this check - middle button will be used too, and we don't want that.
+		var/mob/M = src
+		var/obj/item/weapon/gun/projectile/automatic/W = M.get_inactive_held_item()
+		//We need mouse hold to work at exact scenario and if not passed, then click() will be used instead.
+		//Not sure if all this necessary, but works as needed.
+		if((usr.a_intent == "harm") && istype(W) && isturf(usr.loc) && !(W == src) && !usr.restrained() && !usr.in_throw_mode && (W.fire_delay > 0) && !istype(src, /obj/screen))
+			if((isobj(src) || ismob(src)) && !isturf(src.loc))
+				return
+			if(!usr.mouse_hold)
+				usr.mouse_hold = 1
+
+				var/target = src
+
+				//if(!W.smart_weapon) //Smart weapon? Not in WWI
+				if(isliving(src))
+					var/mob/living/L = src
+					if((L.health > 0) && !L.lying) // We don't need auto aim if target alive and not lying, so player will be forced
+						target = get_turf(src) // to release LMB and click again, to correct his aim. (When shooting at moving target).
+				usr.ms_last_pos = target
+				usr.ClickOnHold(target, params)
+
+/mob
+	var/ms_last_pos = null
+
+/atom/MouseDrag(atom/A)
+	if(isliving(usr))
+		var/mob/living/L = usr
+		if(ismob(A) || isturf(A) || isobj(A))
+			L.ms_last_pos = A
+
+/atom/MouseUp(location,control,params)
+	usr.mouse_hold = 0
+
+/mob/proc/ClickOnHold( atom/A, params )
+	if(fire_in_process)
+		return
+
+	while(mouse_hold)
+		var/obj/item/weapon/gun/W = get_active_held_item()
+		spawn()
+			if(!istype(W))
+				mouse_hold = 0
+				return
+
+			if(!src || !A)
+				mouse_hold = 0
+				return
+
+			fire_in_process = 1
+			if(!istype(W))
+				mouse_hold = 0
+				return
+
+			if((isobj(A) || ismob(A)) && !isturf(A.loc))
+				mouse_hold = 0
+				return
+
+			if(!isturf(loc) || restrained() || in_throw_mode || (a_intent != "harm")) // Who knows, what can happen when we hold button.
+				mouse_hold = 0
+				return
+
+			if(stat || paralysis || stunned || weakened) // Not sure if i want very long lines of ORs.
+				mouse_hold = 0
+				return
+
+//			if(!W.chambered) // Probably can go in previous ORs chain.
+//				mouse_hold = 0
+//				return
+
+			if(ms_last_pos)
+				face_atom(ms_last_pos)
+				if(isliving(ms_last_pos))
+					var/mob/living/L = ms_last_pos
+					if((L.health > 0) && !L.lying)
+						W.afterattack(get_turf(ms_last_pos),src,0,params)
+					else
+						W.afterattack(ms_last_pos,src,0,params)
+				if(isobj(ms_last_pos))
+					W.afterattack(istype(ms_last_pos, /obj/item/clothing/mask/facehugger) ? ms_last_pos : get_turf(ms_last_pos),src,0,params)
+				else
+					W.afterattack(ms_last_pos,src,0,params)
+			else
+				face_atom(A)
+				W.afterattack(A,src,0,params)
+
+		sleep(W.fire_delay ? W.fire_delay : 10)
+		fire_in_process = 0
