@@ -35,6 +35,9 @@
 /obj/item/weapon/storage/internal/pocket/big
 	max_w_class = 3
 
+/obj/item/weapon/storage/internal/pocket/vest
+	storage_slots = 7
+
 /obj/item/weapon/storage/internal/pocket/small
 	storage_slots = 1
 	priority = FALSE
