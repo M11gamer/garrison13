@@ -338,11 +338,16 @@ obj/item/ammo_box/magazine/tommygunm45
 	multiple_sprites = 1
 
 /obj/item/ammo_box/magazine/a792
-	name = "bolt action magazine (7.92)"
+	name = "stripper clip magazine (7.92)"
+	icon_state = "stripclip-5"
 	origin_tech = "combat=2"
 	ammo_type = /obj/item/ammo_casing/a792
 	caliber = "7.92"
 	max_ammo = 5
+
+/obj/item/ammo_box/magazine/a792/update_icon()
+	..()
+	icon_state = "stripclip-[ammo_count()]"
 
 /obj/item/ammo_box/magazine/lebel
 	name = "bolt action magazine (8mm)"

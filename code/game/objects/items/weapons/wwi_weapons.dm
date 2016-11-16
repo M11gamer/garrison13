@@ -13,6 +13,55 @@
 	throw_range = 5
 	attack_verb = list("attacked", "slashed", "stabbed", "sliced", "torn", "ripped", "diced", "cut")
 
+/obj/item/weapon/gun/projectile/verb/DetachBayonet(mob/user as mob)
+	if(bayonet)
+		set name = "Detach bayonet"
+		if(bayonet_affixed)
+			bayonet_affixed = 0
+			update_bayonet_icon()
+			new /obj/item/weapon/bayonet(user.loc)
+			user << "<span class='notice'>You detach the bayonet.</span>"
+			force = initial(force)
+			attack_verb = list("struck", "hit", "bashed")
+		else
+			user << "<span class='notice'>You don't have a bayonet attached.</span>"
+			return
+
+/obj/item/weapon/gun/projectile/attackby(obj/item/weapon/K as obj, mob/user as mob)
+	..()
+	if(istype(K, /obj/item/weapon/bayonet))
+		if(bayonet)
+			if(bayonet_affixed)
+				user << "<span class='warning'>[src] already has a bayonet attached!</span>"
+				return
+			else
+				user << "<span class='notice'>You fix the bayonet onto [src]."
+				bayonet_affixed = 1
+				update_bayonet_icon()
+				force = 25.0
+				attack_verb = list("attacked", "slashed", "stabbed", "sliced", "torn", "ripped", "diced", "cut")
+				qdel(K)
+				return
+		else
+			user << "<span class='warning'>You can't attach a bayonet to this gun!</span>"
+
+/obj/item/weapon/gun/projectile/proc/update_bayonet_icon()
+	if(istype(magazine, /obj/item/ammo_box/magazine/internal))
+		if(bayonet_affixed)
+			icon_state = "[initial(icon_state)]_b"
+		else
+			icon_state = "[initial(icon_state)]"
+	else
+		if(bayonet_affixed && magazine && magazine.ammo_count() > 0)
+			icon_state = "[initial(icon_state)]_b"
+		else if(magazine && magazine.ammo_count() > 0)
+			icon_state = "[initial(icon_state)]"
+		else if(bayonet_affixed)
+			icon_state = "[initial(icon_state)]_b_empty"
+		else
+			icon_state = "[initial(icon_state)]_empty"
+	return
+
 /obj/item/weapon/gun/projectile/shotgun/pump/trenchgun
 	name = "\improper Winchester M97"
 	desc = "Useful for sweeping trenches."
@@ -111,80 +160,12 @@
 	origin_tech = "combat=2;materials=2"
 	mag_type = /obj/item/ammo_box/magazine/internal/cylinder/a455
 
-/obj/item/weapon/gun/projectile/ba_rifle
-	name = "\improper G98 rifle"
-	desc = "A simple yet effective german rifle. Supports 7.92mm 5-round stripper clips."
-	icon_state = "g98"
-	item_state = "ba_rifle"
-	w_class = 4
-	two_handed = 1
-	force = 10
-	slot_flags = SLOT_BACK
-	origin_tech = "combat=8;materials=2;syndicate=8"
-	fire_sound = 'sound/weapons/g98.ogg'
-	//accuracy = 1 //what
-	mag_type = /obj/item/ammo_box/magazine/a792
+/obj/item/weapon/gun/projectile/baction
+	actions_types = list(/datum/action/item_action/eject_mag)
 	var/bolt_open = 0
 	var/recentbolt = 0
-	bayonet = 1
 
-/obj/item/weapon/gun/projectile/verb/DetachBayonet(mob/user as mob)
-	if(bayonet)
-		set name = "Detach bayonet"
-		if(bayonet_affixed)
-			bayonet_affixed = 0
-			update_bayonet_icon()
-			new /obj/item/weapon/bayonet(user.loc)
-			user << "<span class='notice'>You detach the bayonet.</span>"
-			force = initial(force)
-			attack_verb = list("struck", "hit", "bashed")
-		else
-			user << "<span class='notice'>You don't have a bayonet attached.</span>"
-			return
-
-/obj/item/weapon/gun/projectile/attackby(obj/item/weapon/K as obj, mob/user as mob)
-	..()
-	if(istype(K, /obj/item/weapon/bayonet))
-		if(bayonet)
-			if(bayonet_affixed)
-				user << "<span class='warning'>[src] already has a bayonet attached!</span>"
-				return
-			else
-				user << "<span class='notice'>You fix the bayonet onto [src]."
-				bayonet_affixed = 1
-				update_bayonet_icon()
-				force = 25.0
-				attack_verb = list("attacked", "slashed", "stabbed", "sliced", "torn", "ripped", "diced", "cut")
-				qdel(K)
-				return
-		else
-			user << "<span class='warning'>You can't attach a bayonet to this gun!</span>"
-
-/obj/item/weapon/gun/projectile/proc/update_bayonet_icon()
-	if(!istype(magazine, /obj/item/ammo_box/magazine/internal))
-		if(bayonet_affixed)
-			icon_state = "[initial(icon_state)]_b"
-		else
-			icon_state = "[initial(icon_state)]"
-	else
-		if(bayonet_affixed && magazine && magazine.ammo_count() > 0)
-			icon_state = "[initial(icon_state)]_b"
-		else if(magazine && magazine.ammo_count() > 0)
-			icon_state = "[initial(icon_state)]"
-		else if(bayonet_affixed)
-			icon_state = "[initial(icon_state)]empty_b"
-		else
-			icon_state = "[initial(icon_state)]empty"
-	return
-
-/* the actual fuck
-/obj/item/weapon/gun/projectile/ba_rifle/consume_next_projectile()
-	if(chambered)
-		return chambered.BB
-	return null
-*/
-
-/obj/item/weapon/gun/projectile/ba_rifle/proc/bolt_action(mob/user as mob)
+/obj/item/weapon/gun/projectile/baction/proc/bolt_action(mob/user)
 	if(recentbolt)
 		return
 
@@ -213,25 +194,59 @@
 	add_fingerprint(user)
 	update_icon()
 
-/obj/item/weapon/gun/projectile/ba_rifle/special_check(mob/user)
+/obj/item/weapon/gun/projectile/baction/special_check(mob/user)
 	if(bolt_open)
 		user << "<span class='warning'>You can't fire [src] while the bolt is open!</span>"
 		return 0
 	return ..()
 
-/* the fuck is wrong with bay
-/obj/item/weapon/gun/projectile/ba_rifle/load_ammo(var/obj/item/A, mob/user)
+/obj/item/weapon/gun/projectile/baction/proc/eject_mag(mob/user)
+	if(magazine)
+		magazine.dropped()
+		magazine.forceMove(get_turf(src.loc))
+		magazine.update_icon()
+		magazine = null
+	else
+		user << "<span class='warning'>There's no magazine in [src]!</span>"
+		return
+
+/obj/item/weapon/gun/projectile/baction/attack_self(mob/user) //override so we don't remove the mag
+	bolt_action()
+	return
+
+/* the actual fuck
+/obj/item/weapon/gun/projectile/baction/consume_next_projectile()
+	if(chambered)
+		return chambered.BB
+	return null
+
+/obj/item/weapon/gun/projectile/baction/load_ammo(var/obj/item/A, mob/user)
 	if(!bolt_open)
 		return
 	..()
 
-/obj/item/weapon/gun/projectile/ba_rifle/unload_ammo(mob/user, var/allow_dump=1)
+/obj/item/weapon/gun/projectile/baction/unload_ammo(mob/user, var/allow_dump=1)
 	if(!bolt_open)
 		return
 	..()
 */
 
-/obj/item/weapon/gun/projectile/ba_rifle/g98sniper
+/obj/item/weapon/gun/projectile/baction/g98
+	name = "\improper G98 rifle"
+	desc = "A simple yet effective german rifle. Supports 7.92mm 5-round stripper clips."
+	icon_state = "g98"
+	item_state = "ba_rifle"
+	w_class = 4
+	two_handed = 1
+	force = 10
+	slot_flags = SLOT_BACK
+	origin_tech = "combat=8;materials=2;syndicate=8"
+	fire_sound = 'sound/weapons/g98.ogg'
+	//accuracy = 1 //what
+	mag_type = /obj/item/ammo_box/magazine/a792
+	bayonet = 1
+
+/obj/item/weapon/gun/projectile/baction/g98/sniper
 	name = "\improper G98 scoped rifle"
 	desc = "A simple yet effective german five-shot rifle fitted with a scope. Supports 7.92mm 5-round stripper clips."
 	icon_state = "g98sniper"
@@ -240,14 +255,14 @@
 	zoom_amt = 7
 	bayonet = 0
 
-/obj/item/weapon/gun/projectile/ba_rifle/g98sniper/verb/scope(mob/user)
+/obj/item/weapon/gun/projectile/baction/g98/sniper/verb/scope(mob/user)
 	set category = "Object"
 	set name = "Use Scope"
 	set popup_menu = 1
 
 	zoom(user)
 
-/obj/item/weapon/gun/projectile/ba_rifle/lebel
+/obj/item/weapon/gun/projectile/baction/lebel
 	name = "\improper Lebel rifle"
 	desc = "An old french rifle with tubular magazine, which can hold up to 8 cartriges. Uses 8mm ammo."
 	icon_state = "lebel"
@@ -257,7 +272,7 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-/obj/item/weapon/gun/projectile/smle
+/obj/item/weapon/gun/projectile/baction/smle
 	name = "\improper SMLE rifle"
 	desc = "Short Magazine Lee-Enfield - one of the newest british weaponries with detachable magazine, which can hold up to 10 cartriges. Supports .303 British 5-round stripper clips."
 	icon_state = "smle"
@@ -270,18 +285,9 @@
 	origin_tech = "combat=8;materials=2;syndicate=8"
 	fire_sound = 'sound/weapons/smle.ogg'
 	mag_type = /obj/item/ammo_box/magazine/smle
-	var/bolt_open = 0
-	var/recentbolt = 0
 	bayonet = 1
 
-/* :/
-/obj/item/weapon/gun/projectile/smle/consume_next_projectile()
-	if(chambered)
-		return chambered.BB
-	return null
-*/
-
-/obj/item/weapon/gun/projectile/smle/attackby(obj/item/W as obj, mob/user as mob)
+/obj/item/weapon/gun/projectile/baction/smle/attackby(obj/item/W as obj, mob/user as mob)
 	if(istype(W, /obj/item/ammo_casing))
 		if(!bolt_open)
 			return
@@ -328,40 +334,7 @@
 		else
 			user << "<span class='warning'>You can't attach a bayonet to this gun!</span>"
 
-/obj/item/weapon/gun/projectile/smle/proc/smle_bolt_action(mob/user as mob)
-	if(recentbolt)
-		return
-
-	bolt_open = !bolt_open
-	recentbolt = 1
-	if(bolt_open)
-		playsound(src.loc, 'sound/weapons/smle_reload1.ogg', 50, 1)
-		if(chambered)
-			user << "<span class='notice'>You work the bolt open, ejecting [chambered]!</span>"
-			chambered.loc = get_turf(src)
-			chambered = null
-		else
-			user << "<span class='notice'>You work the bolt open.</span>"
-	else
-		playsound(src.loc, 'sound/weapons/smle_reload2.ogg', 50, 1)
-		user << "<span class='notice'>You work the bolt closed.</span>"
-		if(magazine && magazine.ammo_count() > 0)
-			var/obj/item/ammo_casing/AC = magazine.stored_ammo[1]
-			magazine.stored_ammo -= AC
-			chambered = AC
-		bolt_open = 0
-	spawn(5)
-		recentbolt = 0
-	add_fingerprint(user)
-	update_icon()
-
-/obj/item/weapon/gun/projectile/smle/special_check(mob/user)
-	if(bolt_open)
-		user << "<span class='warning'>You can't fire [src] while the bolt is open!</span>"
-		return 0
-	return ..()
-
-/obj/item/weapon/gun/projectile/smle/update_icon()
+/obj/item/weapon/gun/projectile/baction/smle/update_icon()
 	..()
 	if(magazine)
 		icon_state = "smle"
@@ -369,7 +342,7 @@
 		icon_state = "smleempty"
 	return
 
-/obj/item/weapon/gun/projectile/smle/sniper
+/obj/item/weapon/gun/projectile/baction/smle/sniper
 	name = "\improper SMLE scoped rifle"
 	desc = "Short Magazine Lee-Enfield - one of the newest british weaponries with detachable magazine, which can hold up to 10 cartriges, now fitted with a scope. Supports .303 British 5-round stripper clips."
 	icon_state = "smlesniper"
@@ -378,7 +351,7 @@
 	zoom_amt = 7
 	bayonet = 0
 
-/obj/item/weapon/gun/projectile/smle/sniper/update_icon()
+/obj/item/weapon/gun/projectile/baction/smle/sniper/update_icon()
 	..()
 	if(magazine)
 		icon_state = "smlesniper"
@@ -386,7 +359,7 @@
 		icon_state = "smlesniperempty"
 	return
 
-/obj/item/weapon/gun/projectile/smle/sniper/verb/scope(mob/user)
+/obj/item/weapon/gun/projectile/baction/smle/sniper/verb/scope(mob/user)
 	set category = "Object"
 	set name = "Use Scope"
 	set popup_menu = 1
