@@ -77,6 +77,12 @@
 	caliber = "n762"
 	max_ammo = 7
 
+/obj/item/ammo_box/magazine/internal/cylinder/a455
+	name = "webley revolver cylinder"
+	ammo_type = /obj/item/ammo_casing/a455
+	caliber = "455"
+	max_ammo = 6
+
 // Shotgun internal mags
 /obj/item/ammo_box/magazine/internal/shot
 	name = "shotgun internal magazine"
@@ -160,6 +166,11 @@
 	max_ammo =1
 	ammo_type = /obj/item/ammo_casing/a762/enchanted
 
+/obj/item/ammo_box/magazine/internal/shot/trench
+	name = "\improper Winchester M97 internal magazine"
+	ammo_type = /obj/item/ammo_casing/shotgun/buckshot
+	max_ammo = 7
+	multiload = 1
 
 /obj/item/ammo_box/magazine/internal/shot/toy
 	ammo_type = /obj/item/ammo_casing/caseless/foam_dart
@@ -257,6 +268,16 @@
 	name = "SMG Magazine (Incindiary 9mm)"
 	ammo_type = /obj/item/ammo_casing/c9mminc
 
+/obj/item/ammo_box/magazine/c32m
+	name = "ruby magazine (.32)"
+	icon_state = "rubymag-8"
+	ammo_type = /obj/item/ammo_casing/c32m
+	max_ammo = 8
+
+/obj/item/ammo_box/magazine/c32m/update_icon()
+	..()
+	icon_state = "rubymag-[ammo_count() > 0 ? "8" : "0"]"
+
 /obj/item/ammo_box/magazine/pistolm9mm
 	name = "pistol magazine (9mm)"
 	icon_state = "9x19p-8"
@@ -267,6 +288,26 @@
 /obj/item/ammo_box/magazine/pistolm9mm/update_icon()
 	..()
 	icon_state = "9x19p-[ammo_count() ? "8" : "0"]"
+
+/obj/item/ammo_box/magazine/pistolm9mm/p08
+	name = "luger magazine (9mm)"
+	icon_state = "p08mag"
+	max_ammo = 8
+
+/obj/item/ammo_box/magazine/pistolm9mm/p08/update_icon()
+	..()
+	icon_state = "p08mag[ammo_count() > 0 ? "" : "-0"]"
+
+/obj/item/ammo_box/magazine/mauser
+	name = "mauser magazine (9mm)"
+	icon_state = "mauser-10"
+	ammo_type = /obj/item/ammo_casing/c9mm
+	caliber = "9mm"
+	max_ammo = 10
+
+/obj/item/ammo_box/magazine/mauser/update_icon()
+	..()
+	icon_state = "mauser-[ammo_count()]"
 
 /obj/item/ammo_box/magazine/smgm45
 	name = "SMG magazine (.45)"
@@ -295,6 +336,31 @@ obj/item/ammo_box/magazine/tommygunm45
 	caliber = ".50"
 	max_ammo = 7
 	multiple_sprites = 1
+
+/obj/item/ammo_box/magazine/a792
+	name = "bolt action magazine (7.92)"
+	origin_tech = "combat=2"
+	ammo_type = /obj/item/ammo_casing/a792
+	caliber = "7.92"
+	max_ammo = 5
+
+/obj/item/ammo_box/magazine/lebel
+	name = "bolt action magazine (8mm)"
+	origin_tech = "combat=2"
+	ammo_type = /obj/item/ammo_casing/c8mm
+	caliber = "8mm"
+	max_ammo = 8
+
+/obj/item/ammo_box/magazine/smle
+	name = "bolt action magazine (SMLE .303)"
+	ammo_type = /obj/item/ammo_casing/a303
+	icon_state = "smlemag"
+	caliber = "a303"
+	max_ammo = 5
+
+/obj/item/ammo_box/magazine/smle/update_icon()
+	..()
+	icon_state = "smlemag[ammo_count() > 0 ? "" : "-0"]"
 
 /obj/item/ammo_box/magazine/m75
 	name = "specialized magazine (.75)"
@@ -427,8 +493,38 @@ obj/item/ammo_box/magazine/tommygunm45
 	..()
 	icon_state = "a762-[round(ammo_count(),10)]"
 
+/obj/item/ammo_box/magazine/wwi_mg
+	name = "drum magazine (MG 08-15)"
+	icon_state = "mg08mag"
+	ammo_type = /obj/item/ammo_casing/a762
+	caliber = "a762"
+	max_ammo = 100
 
+/obj/item/ammo_box/magazine/wwi_mg/update_icon()
+	..()
+	icon_state = "mg08mag[ammo_count() > 0 ? "" : "-0"]"
 
+/obj/item/ammo_box/magazine/lewis
+	name = "pan magazine (Lewis .303)"
+	icon_state = "lewismag"
+	ammo_type = /obj/item/ammo_casing/a303
+	caliber = "a303"
+	max_ammo = 47
+
+/obj/item/ammo_box/magazine/lewis/update_icon()
+	..()
+	icon_state = "lewismag[ammo_count() > 0 ? "" : "-0"]"
+
+/obj/item/ammo_box/magazine/chauchat
+	name = "box magazine (Chauchat 8mm)"
+	icon_state = "chauchatmag"
+	ammo_type = /obj/item/ammo_casing/c8mm
+	caliber = "8mm"
+	max_ammo = 20
+
+/obj/item/ammo_box/magazine/chauchat/update_icon()
+	..()
+	icon_state = "chauchatmag[ammo_count() > 0 ? "" : "-0"]"
 
 ////TOY GUN MAGAZINES
 

@@ -6,6 +6,14 @@
 	max_ammo = 7
 	multiple_sprites = 1
 
+/obj/item/ammo_box/a455
+	name = "speed loader (.455)"
+	desc = "Designed to quickly reload revolvers."
+	icon_state = "455"
+	ammo_type = /obj/item/ammo_casing/a455
+	max_ammo = 6
+	multiple_sprites = 1
+
 /obj/item/ammo_box/c38
 	name = "speed loader (.38)"
 	desc = "Designed to quickly reload revolvers."

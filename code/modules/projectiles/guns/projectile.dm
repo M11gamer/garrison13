@@ -6,6 +6,8 @@
 	w_class = 3
 	var/spawnwithmagazine = 1
 
+	var/bayonet = 0
+	var/bayonet_affixed = 0
 	var/mag_type = /obj/item/ammo_box/magazine/m10mm //Removes the need for max_ammo and caliber info
 	var/obj/item/ammo_box/magazine/magazine
 
@@ -209,4 +211,3 @@
 	desc = "A foreign knock-off suppressor, it feels flimsy, cheap, and brittle. Still fits all weapons."
 	icon = 'icons/obj/guns/projectile.dmi'
 	icon_state = "suppressor"
-
