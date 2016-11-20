@@ -59,6 +59,7 @@
 	var/zoomable = FALSE //whether the gun generates a Zoom action on creation
 	var/zoomed = FALSE //Zoom toggle
 	var/zoom_amt = 3 //Distance in TURFs to move the user's screen forward (the "zoom" effect)
+	var/firerdir = NORTH //direction of the shooter at the time of the zooming
 	var/datum/action/toggle_scope_zoom/azoom
 
 
@@ -123,7 +124,7 @@
 			user.visible_message("<span class='danger'>[user] fires [src]!</span>", "<span class='danger'>You fire [src]!</span>", "You hear a [istype(src, /obj/item/weapon/gun/energy) ? "laser blast" : "gunshot"]!")
 
 	if(weapon_weight >= WEAPON_MEDIUM)
-		if(user.get_inactive_held_item())
+		if(two_handed && !wielded)
 			if(prob(15))
 				if(user.drop_item())
 					user.visible_message("<span class='danger'>[src] flies out of [user]'s hands!</span>", "<span class='userdanger'>[src] kicks out of your grip!</span>")
@@ -135,6 +136,8 @@
 
 /obj/item/weapon/gun/afterattack(atom/target, mob/living/user, flag, params)
 	if(firing_burst)
+		return
+	if(!special_check(user))
 		return
 	if(flag) //It's adjacent, is the user, or is on the user's person
 		if(target in user.contents) //can't shoot stuff inside us.
@@ -205,10 +208,13 @@ obj/item/weapon/gun/proc/newshot()
 		return
 
 	if(weapon_weight)
-		if(user.get_inactive_held_item())
+		if(two_handed && !wielded)
 			recoil = 4 //one-handed kick
 		else
 			recoil = initial(recoil)
+
+	if(chambered)
+		chambered.gunff = src
 
 	if(burst_size > 1)
 		firing_burst = 1
@@ -306,12 +312,10 @@ obj/item/weapon/gun/proc/newshot()
 	if(!user.IsAdvancedToolUser())
 		return 0
 
-
-	var/obj/item/weapon/gun/offhand/O = user.get_inactive_held_item()
-	var/two_handed_check = 1
-	if(two_handed_check && two_handed && !istype(O))
-		user << "<span class='warning'>You must grab the [name] with both hands in order to fire.</span>"
+	if(two_handed && !wielded)
+		user << "<span class='warning'>You must grab [src] with both hands in order to fire.</span>"
 		return 0
+	return 1
 
 /obj/item/weapon/gun/mob_can_equip(mob/M, slot)
 	//Cannot equip wielded items.
@@ -323,7 +327,7 @@ obj/item/weapon/gun/proc/newshot()
 /obj/item/weapon/gun/proc/unwield(mob/living/carbon/user)
 	if(!wielded || !user) return
 	wielded = 0
-	update_item_wielded()
+	update_item_wielded(user)
 	var/sf = findtext(name," (Wielded)")
 	if(sf)
 		name = copytext(name,1,sf)
@@ -336,13 +340,16 @@ obj/item/weapon/gun/proc/newshot()
 		O.unwield()
 	return
 
-/obj/item/weapon/gun/proc/wield(mob/living/carbon/user)
+/obj/item/weapon/gun/proc/wield(mob/living/carbon/user, wieldicon)
 	if(wielded) return
 	if(user.get_inactive_held_item())
 		user << "<span class='warning'>You need your other hand to be empty!</span>"
 		return
 	wielded = 1
-	update_item_wielded()
+	if(wieldicon)
+		update_item_wielded(user, wieldicon)
+	else
+		update_item_wielded(user)
 	name = "[name] (Wielded)"
 	update_icon()
 	user << "<span class='notice'>You grab the [name] with both hands.</span>"
@@ -352,11 +359,17 @@ obj/item/weapon/gun/proc/newshot()
 	user.put_in_inactive_hand(O)
 	return
 
-/obj/item/weapon/gun/proc/update_item_wielded(mob/living/carbon/user)
-	if(wielded)
-		item_state = "[initial(item_state)]_w"
+/obj/item/weapon/gun/proc/update_item_wielded(mob/living/carbon/user, wieldicon)
+	if(!wieldicon)
+		if(wielded)
+			item_state = "[initial(item_state)]_w"
+		else
+			item_state = "[initial(item_state)]"
 	else
-		item_state = "[initial(item_state)]"
+		if(wielded)
+			item_state = wieldicon
+		else
+			item_state = "[initial(item_state)]"
 	user.update_icons()
 	return
 
@@ -373,14 +386,6 @@ obj/item/weapon/gun/proc/newshot()
 
 /obj/item/weapon/gun/offhand/wield()
 	qdel(src)
-
-/obj/item/weapon/gun/dropped(mob/user)
-	//handles unwielding a twohanded weapon when dropped as well as clearing up the offhand
-	if(user && two_handed)
-		var/obj/item/weapon/gun/O = user.get_inactive_held_item()
-		if(istype(O))
-			O.unwield(user)
-		return	unwield(user)
 
 /obj/item/weapon/gun/proc/toggle_gunlight()
 	set name = "Toggle Gunlight"
@@ -432,6 +437,9 @@ obj/item/weapon/gun/proc/newshot()
 
 /obj/item/weapon/gun/dropped(mob/user)
 	..()
+	//handles unwielding a twohanded weapon when dropped
+	if(user && two_handed && wielded)
+		unwield(user)
 	if(F)
 		if(F.on)
 			user.AddLuminosity(-F.brightness_on)
@@ -439,7 +447,9 @@ obj/item/weapon/gun/proc/newshot()
 	zoom(user,FALSE)
 	if(azoom)
 		azoom.Remove(user)
-
+	for(var/X in actions)
+		var/datum/action/A = X
+		A.Remove(user)
 
 /obj/item/weapon/gun/AltClick(mob/user)
 	..()
@@ -526,6 +536,7 @@ obj/item/weapon/gun/proc/newshot()
 
 
 /obj/item/weapon/gun/proc/zoom(mob/living/user, forced_zoom)
+	firerdir = user.dir
 	if(!user || !user.client)
 		return
 
@@ -565,4 +576,3 @@ obj/item/weapon/gun/proc/newshot()
 	if(zoomable)
 		azoom = new()
 		azoom.gun = src
-

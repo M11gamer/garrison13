@@ -50,6 +50,7 @@
 	var/forcedodge = 0 //to pass through everything
 	var/dismemberment = 0 //The higher the number, the greater the bonus to dismembering. 0 will not dismember at all.
 	var/impact_effect_type //what type of impact effect to show when hitting something
+	var/obj/item/weapon/gun/gunff = null
 
 /obj/item/projectile/New()
 	permutated = list()
@@ -167,6 +168,9 @@
 /obj/item/projectile/proc/fire(var/setAngle)
 	if(setAngle)
 		Angle = setAngle
+	else
+		if(gunff && gunff.zoomable && gunff.zoomed)
+			Angle = Get_Angle(firer, original)
 	if(!legacy) //new projectiles
 		set waitfor = 0
 		var/next_run = world.time
@@ -197,7 +201,7 @@
 			while(pixel_x_offset > 16)
 				pixel_x_offset -= 32
 				pixel_x -= 32
-				new_x++// x++
+				new_x++ //x++
 			while(pixel_x_offset < -16)
 				pixel_x_offset += 32
 				pixel_x += 32

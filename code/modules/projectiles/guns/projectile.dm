@@ -67,7 +67,8 @@
 			magazine = AM
 			magazine.loc = src
 			user << "<span class='notice'>You load a new magazine into \the [src].</span>"
-			chamber_round()
+			if(!istype(src, /obj/item/weapon/gun/projectile/baction)) //no automatic chambering for bolt actions
+				chamber_round()
 			A.update_icon()
 			update_icon()
 			return 1

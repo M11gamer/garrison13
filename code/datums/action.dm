@@ -152,9 +152,6 @@
 /datum/action/item_action/toggle_firemode
 	name = "Toggle Firemode"
 
-/datum/action/item_action/eject_mag
-	name = "Eject Magazine"
-
 /datum/action/item_action/startchainsaw
 	name = "Pull The Starting Cord"
 

@@ -168,7 +168,7 @@
 
 /obj/item/ammo_box/magazine/internal/shot/trench
 	name = "\improper Winchester M97 internal magazine"
-	ammo_type = /obj/item/ammo_casing/shotgun/buckshot
+	ammo_type = /obj/item/ammo_casing/shotgun/buckshot/trench
 	max_ammo = 7
 	multiload = 1
 
@@ -351,10 +351,15 @@ obj/item/ammo_box/magazine/tommygunm45
 
 /obj/item/ammo_box/magazine/lebel
 	name = "bolt action magazine (8mm)"
+	icon_state = "stripclip-5"
 	origin_tech = "combat=2"
 	ammo_type = /obj/item/ammo_casing/c8mm
 	caliber = "8mm"
 	max_ammo = 8
+
+/obj/item/ammo_box/magazine/lebel/update_icon()
+	..()
+	icon_state = "stripclip-[ammo_count()]"
 
 /obj/item/ammo_box/magazine/smle
 	name = "bolt action magazine (SMLE .303)"

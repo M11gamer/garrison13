@@ -17,6 +17,8 @@
 	var/delay = 0								//Delay for energy weapons
 	var/click_cooldown_override = 0				//Override this to make your gun have a faster fire rate, in tenths of a second. 4 is the default gun cooldown.
 	var/firing_effect_type = /obj/effect/overlay/temp/dir_setting/firing_effect	//the visual effect appearing when the ammo is fired.
+	var/obj/item/weapon/gun/gunff = null //the gun used to fire the ammo
+	var/nolive = 1
 
 
 /obj/item/ammo_casing/New()
@@ -30,8 +32,9 @@
 
 /obj/item/ammo_casing/update_icon()
 	..()
-	icon_state = "[initial(icon_state)][BB ? "-live" : ""]"
-	desc = "[initial(desc)][BB ? "" : " This one is spent"]"
+	if(!nolive)
+		icon_state = "[initial(icon_state)][BB ? "-live" : ""]"
+		desc = "[initial(desc)][BB ? "" : " This one is spent"]"
 
 /obj/item/ammo_casing/proc/newshot() //For energy weapons, shotgun shells and wands (!).
 	if(!BB)
