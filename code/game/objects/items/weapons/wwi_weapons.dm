@@ -52,13 +52,13 @@
 		else
 			icon_state = "[initial(icon_state)]"
 	else
-		if(bayonet_affixed && magazine && magazine.ammo_count() > 0)
+		if(bayonet_affixed && magazine)
 			icon_state = "[initial(icon_state)]_b"
-		else if(magazine && magazine.ammo_count() > 0)
+		if(!bayonet_affixed && magazine)
 			icon_state = "[initial(icon_state)]"
-		else if(bayonet_affixed)
+		if(bayonet_affixed && !magazine)
 			icon_state = "[initial(icon_state)]_b_empty"
-		else
+		if(!bayonet_affixed && !magazine)
 			icon_state = "[initial(icon_state)]_empty"
 	return
 
