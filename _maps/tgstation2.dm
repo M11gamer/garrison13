@@ -4,6 +4,7 @@
 
 		#define MINETYPE "lavaland"
 
+/*
         #include "map_files\TgStation\tgstation.2.1.3.dmm"
         #include "map_files\generic\z2.dmm"
         #include "map_files\generic\z3.dmm"
@@ -15,10 +16,12 @@
 		#include "map_files\generic\z9.dmm"
 		#include "map_files\generic\z10.dmm"
 		#include "map_files\generic\z11.dmm"
+*/
+		#include "map_files\WWI\MarkedTrenches.dmm"
 
-		#define MAP_PATH "map_files/TgStation"
-        #define MAP_FILE "tgstation.2.1.3.dmm"
-        #define MAP_NAME "Box Station"
+		#define MAP_PATH "map_files/WWI"
+        #define MAP_FILE "MarkedTrenches.dmm"
+        #define MAP_NAME "Alpha WWI"
 
 		#define MAP_TRANSITION_CONFIG DEFAULT_MAP_TRANSITION_CONFIG
 

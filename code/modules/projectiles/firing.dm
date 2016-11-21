@@ -23,6 +23,7 @@
 /obj/item/ammo_casing/proc/ready_proj(atom/target, mob/living/user, quiet, zone_override = "")
 	if (!BB)
 		return
+	BB.gunff = gunff
 	BB.original = target
 	BB.firer = user
 	if (zone_override)

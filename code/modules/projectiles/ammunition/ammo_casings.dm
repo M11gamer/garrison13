@@ -1,6 +1,16 @@
+/obj/item/ammo_casing/a303
+	desc = "A .303 bullet casing."
+	caliber = "a303"
+	projectile_type = /obj/item/projectile/bullet
+
 /obj/item/ammo_casing/a357
 	desc = "A .357 bullet casing."
 	caliber = "357"
+	projectile_type = /obj/item/projectile/bullet
+
+/obj/item/ammo_casing/a455
+	desc = "A .455 bullet casing."
+	caliber = "455"
 	projectile_type = /obj/item/projectile/bullet
 
 /obj/item/ammo_casing/a762
@@ -11,6 +21,11 @@
 
 /obj/item/ammo_casing/a762/enchanted
 	projectile_type = /obj/item/projectile/bullet/weakbullet3
+
+/obj/item/ammo_casing/a792
+	desc = "A 7.92 bullet casing."
+	caliber = "a792"
+	projectile_type = /obj/item/projectile/bullet
 
 /obj/item/ammo_casing/a50
 	desc = "A .50AE bullet casing."
@@ -26,6 +41,11 @@
 	desc = "A 10mm bullet casing."
 	caliber = "10mm"
 	projectile_type = /obj/item/projectile/bullet/midbullet3
+
+/obj/item/ammo_casing/c8mm
+	desc = "An 8mm bullet casing."
+	caliber = "8mm"
+	projectile_type = /obj/item/projectile/bullet/weakbullet3
 
 /obj/item/ammo_casing/c9mm
 	desc = "A 9mm bullet casing."
@@ -46,6 +66,11 @@
 	desc = "A 9mm bullet casing."
 	caliber = "9mm"
 	projectile_type = /obj/item/projectile/bullet/incendiary/firebullet
+
+/obj/item/ammo_casing/c32m
+	desc = "A .32 bullet casing."
+	caliber = ".32"
+	projectile_type = /obj/item/projectile/bullet/weakbullet3
 
 /obj/item/ammo_casing/c46x30mm
 	desc = "A 4.6x30mm bullet casing."
@@ -170,6 +195,12 @@
 	projectile_type = /obj/item/projectile/bullet/pellet
 	pellets = 6
 	variance = 25
+
+/obj/item/ammo_casing/shotgun/buckshot/trench
+	name = "Winchester M97 buckshot shell"
+	desc = "A Winchester M97 buckshot shell."
+	icon_state = "sshell_1"
+	nolive = TRUE
 
 /obj/item/ammo_casing/shotgun/rubbershot
 	name = "rubber shot"

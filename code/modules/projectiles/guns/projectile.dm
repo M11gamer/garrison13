@@ -6,6 +6,8 @@
 	w_class = 3
 	var/spawnwithmagazine = 1
 
+	var/bayonet = 0
+	var/bayonet_affixed = 0
 	var/mag_type = /obj/item/ammo_box/magazine/m10mm //Removes the need for max_ammo and caliber info
 	var/obj/item/ammo_box/magazine/magazine
 
@@ -65,7 +67,8 @@
 			magazine = AM
 			magazine.loc = src
 			user << "<span class='notice'>You load a new magazine into \the [src].</span>"
-			chamber_round()
+			if(!istype(src, /obj/item/weapon/gun/projectile/baction)) //no automatic chambering for bolt actions
+				chamber_round()
 			A.update_icon()
 			update_icon()
 			return 1
@@ -209,4 +212,3 @@
 	desc = "A foreign knock-off suppressor, it feels flimsy, cheap, and brittle. Still fits all weapons."
 	icon = 'icons/obj/guns/projectile.dmi'
 	icon_state = "suppressor"
-
